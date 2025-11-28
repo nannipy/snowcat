@@ -8,14 +8,18 @@ import { GroomModal } from './GroomModal';
 import { Loader2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
-export function DustScanner() {
+interface DustScannerProps {
+    onAvalanche?: () => void;
+}
+
+export function DustScanner({ onAvalanche }: DustScannerProps) {
     const { isConnected, refetchBalance } = useMockWallet();
     const { data: tokens, isLoading, error, refetch } = useGlacierBalances();
     const { burnToken, isBurnPending, isBurnConfirming } = useBurnToken();
     const { swapToken, isLoading: isSwapLoading } = use1inchSwap();
 
-    // Filter for dust: value < $5 (and > 0)
-    const dustTokens = tokens?.filter(t => (t.value || 0) < 5 && (t.value || 0) > 0) || [];
+    // Filter for dust: value < $1000 (increased for testing) and > 0
+    const dustTokens = tokens?.filter(t => (t.value || 0) < 1000 && (t.value || 0) > 0) || [];
 
     const [selectedToken, setSelectedToken] = useState<any | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,8 +32,26 @@ export function DustScanner() {
     const handleConfirmGroom = async (token: any) => {
         if (!token) return;
         try {
-            await swapToken(token.address, token.balance, token.decimals);
-            toast.success('Groomed successfully! 🧹');
+            const txHash = await swapToken(token.address, token.balance, token.decimals);
+            
+            if (onAvalanche) onAvalanche(); // Trigger Avalanche Effect
+            
+            toast.success(() => (
+                <div className="flex flex-col gap-1">
+                    <span className="font-bold">Groomed successfully! 🧹</span>
+                    {txHash && (
+                        <a 
+                            href={`https://testnet.snowtrace.io/tx/${txHash}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-xs underline opacity-80 hover:opacity-100"
+                        >
+                            View on Snowtrace ↗
+                        </a>
+                    )}
+                </div>
+            ));
+            
             if (window.navigator.vibrate) window.navigator.vibrate(200);
             refetch(); // Refresh list
             refetchBalance(); // Refresh AVAX balance
@@ -43,8 +65,26 @@ export function DustScanner() {
         if (!confirm(`Are you sure you want to bury ${token.symbol}? This cannot be undone.`)) return;
         
         try {
-            await burnToken(token.address, BigInt(token.balance));
-            toast.success('Buried successfully! ⚰️');
+            const txHash = await burnToken(token.address, BigInt(token.balance));
+            
+            if (onAvalanche) onAvalanche(); // Trigger Avalanche Effect
+            
+            toast.success(() => (
+                <div className="flex flex-col gap-1">
+                    <span className="font-bold">Buried successfully! ⚰️</span>
+                    {txHash && (
+                        <a 
+                            href={`https://testnet.snowtrace.io/tx/${txHash}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-xs underline opacity-80 hover:opacity-100"
+                        >
+                            View on Snowtrace ↗
+                        </a>
+                    )}
+                </div>
+            ));
+            
             if (window.navigator.vibrate) window.navigator.vibrate([50, 50, 50]);
             refetch(); // Refresh list
         } catch (err) {

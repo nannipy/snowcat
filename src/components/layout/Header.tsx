@@ -17,9 +17,8 @@ export function Header() {
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border bg-surface/80 backdrop-blur-md">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                <div className="flex items-center gap-2">
-                    <span className="text-2xl">🐱❄️</span>
-                    <h1 className="text-xl font-bold tracking-tight text-primary">Snowcat</h1>
+                <div className="flex items-center gap-4 mt-4 ">
+                    <img src="/snowcat.png" alt="Snowcat" className="h-14 w-auto"/>
                 </div>
                 {isConnected ? (
                     <div className="flex items-center gap-3">

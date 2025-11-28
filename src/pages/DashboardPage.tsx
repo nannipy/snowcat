@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { DustScanner } from '../components/features/DustScanner';
 import { useGlacierBalances } from '../hooks/useGlacierBalances';
+import { AvalancheConfetti } from '../components/effects/AvalancheConfetti';
 import { Loader2, TrendingUp, Wallet } from 'lucide-react';
 
 export function DashboardPage() {
     const { data: tokens, isLoading } = useGlacierBalances();
+    const [isConfettiActive, setIsConfettiActive] = useState(false);
 
     // Separate Dust (< $5) from Whales (>= $5)
     const dustTokens = tokens?.filter(t => (t.value || 0) < 5 && (t.value || 0) > 0) || [];
@@ -14,23 +17,40 @@ export function DashboardPage() {
     const netWorth = tokens?.reduce((acc, t) => acc + (t.value || 0), 0) || 0;
 
     return (
-        <div className="container mx-auto max-w-5xl p-4 pb-20 space-y-8">
+        <>
+            <AvalancheConfetti isActive={isConfettiActive} onComplete={() => setIsConfettiActive(false)} />
+            
+            <div className="container mx-auto max-w-5xl p-4 pb-20 space-y-8">
+            {/* Hero Stats */}
             {/* Hero Stats */}
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-3xl bg-surface p-8 border border-border shadow-sm"
+                className="rounded-3xl bg-surface p-8 border border-border shadow-sm relative overflow-hidden"
             >
-                <div className="flex items-center gap-3 text-muted mb-2">
-                    <Wallet className="h-5 w-5" />
-                    <span className="text-sm font-medium">Net Worth</span>
-                </div>
-                <div className="text-4xl font-bold text-primary">
-                    ${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-                <div className="flex items-center gap-2 mt-2 text-success text-sm font-medium">
-                    <TrendingUp className="h-4 w-4" />
-                    <span>+2.4% (24h)</span>
+                
+                <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 text-muted">
+                            <Wallet className="h-5 w-5" />
+                            <span className="text-sm font-medium">Net Worth</span>
+                        </div>
+                        <button 
+                            onClick={() => window.location.reload()} 
+                            className="p-2 hover:bg-secondary rounded-full transition-colors text-muted hover:text-primary"
+                            title="Refresh Balances"
+                        >
+                        </button>
+                    </div>
+                    
+                    <div className="text-5xl font-bold text-primary tracking-tight">
+                        ${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mt-4 text-success text-sm font-medium bg-success/10 w-fit px-3 py-1 rounded-full">
+                        <TrendingUp className="h-4 w-4" />
+                        <span>+2.4% (24h)</span>
+                    </div>
                 </div>
             </motion.div>
 
@@ -50,7 +70,7 @@ export function DashboardPage() {
                     but for now it works as a self-contained feature. 
                 */}
                 <div className="rounded-3xl bg-surface/50 border border-border/50 p-6 backdrop-blur-sm">
-                    <DustScanner />
+                    <DustScanner onAvalanche={() => setIsConfettiActive(true)} />
                 </div>
             </section>
 
@@ -111,6 +131,7 @@ export function DashboardPage() {
                     )}
                 </div>
             </section>
-        </div>
+            </div>
+        </>
     );
 }

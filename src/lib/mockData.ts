@@ -1,6 +1,6 @@
 export const MOCK_TOKENS = [
     {
-        address: '0x1234567890123456789012345678901234567890',
+        address: '0x68B773B8C10F2ACE8aC51980A1548B6B48a2eC54',
         name: 'USD Coin',
         symbol: 'USDC',
         decimals: 6,
