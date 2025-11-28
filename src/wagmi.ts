@@ -1,12 +1,13 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { avalancheFuji } from 'wagmi/chains';
+import { avalanche, avalancheFuji } from 'wagmi/chains';
 import { http } from 'wagmi';
 
 export const config = getDefaultConfig({
-    appName: 'Avax DustSweeper',
-    projectId: 'YOUR_PROJECT_ID', // Replace with a valid WalletConnect Project ID if needed, or use a public one for dev
-    chains: [avalancheFuji],
+    appName: 'Snowcat',
+    projectId: import.meta.env.VITE_WALLET_CONNECT_ID || 'YOUR_PROJECT_ID',
+    chains: [avalanche, avalancheFuji],
     transports: {
+        [avalanche.id]: http(),
         [avalancheFuji.id]: http(),
     },
 });

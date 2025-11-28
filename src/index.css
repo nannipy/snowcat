@@ -1,24 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
-  /* Minimal Matte Black Palette */
-  --color-background: #000000;
-  /* Pure Black */
-  --color-surface: #09090b;
-  /* Zinc 950 */
-  --color-primary: #ffffff;
-  /* White for high contrast */
-  --color-secondary: #27272a;
-  /* Zinc 800 */
-  --color-accent: #ccff00;
-  /* Volt - Sharp, distinctive accent */
-  --color-text: #ededed;
-  /* Off-white */
-  --color-muted: #a1a1aa;
-  /* Zinc 400 */
-  --color-border: #27272a;
-  /* Zinc 800 */
+  color-scheme: light;
+  /* Snowcat Clean Palette */
+  --color-background: #f8fafc;
+  /* Slate 50 - Snow White */
+  --color-surface: #ffffff;
+  /* Pure White */
+  --color-primary: #0f172a;
+  /* Slate 900 - Deep Navy/Black */
+  --color-secondary: #e2e8f0;
+  /* Slate 200 - Light Ice */
+  --color-accent: #0ea5e9;
+  /* Sky 500 - Ice Blue */
+  --color-danger: #ef4444;
+  /* Red 500 - Bury/Burn */
+  --color-success: #22c55e;
+  /* Green 500 - Groom/Swap */
+  --color-text: #0f172a;
+  /* Slate 900 */
+  --color-muted: #64748b;
+  /* Slate 500 */
+  --color-border: #e2e8f0;
+  /* Slate 200 */
 }
 
 @theme {
@@ -27,6 +31,8 @@
   --color-primary: var(--color-primary);
   --color-secondary: var(--color-secondary);
   --color-accent: var(--color-accent);
+  --color-danger: var(--color-danger);
+  --color-success: var(--color-success);
   --color-text: var(--color-text);
   --color-muted: var(--color-muted);
   --color-border: var(--color-border);
@@ -45,4 +51,22 @@ body {
 @utility glass-card {
   /* Removed blur for matte look, kept subtle border */
   @apply bg-surface border border-border;
+}
+
+/* Konami Mode Styles */
+.konami-mode {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23f97316"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/></svg>') 12 12, auto;
+}
+
+.konami-mode::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(249, 115, 22, 0.05);
+  /* Orange Tint */
+  pointer-events: none;
+  z-index: 9999;
 }
