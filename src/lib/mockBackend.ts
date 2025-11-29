@@ -9,9 +9,9 @@ export interface MockToken {
     logoUri?: string;
 }
 
-import { MOCK_DUST } from '../constants/mockDust';
+import { MOCK_TOKENS } from './mockData';
 
-const INITIAL_TOKENS: MockToken[] = MOCK_DUST;
+const INITIAL_TOKENS: MockToken[] = MOCK_TOKENS;
 
 class MockBackendService {
     private tokens: MockToken[];

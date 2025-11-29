@@ -1,5 +1,6 @@
 import { Header } from './Header';
 import { useKonamiCode } from '../../hooks/useKonamiCode';
+import { SnowEffect } from '../effects/SnowEffect';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -10,6 +11,7 @@ export function Layout({ children }: LayoutProps) {
 
     return (
         <div className={`min-h-screen bg-background font-sans text-text selection:bg-accent selection:text-white ${isKonamiMode ? 'konami-mode' : ''}`}>
+            <SnowEffect />
             <Header />
             <main className="container mx-auto px-4 py-8 pt-32">
                 {children}

@@ -47,7 +47,7 @@ export function DustCard({ token, onGroom, onBury, isGrooming, isBurying, isGroo
     };
 
     return (
-        <div className="group relative overflow-hidden rounded-xl border border-border bg-surface p-4 transition-all hover:shadow-md hover:border-accent/50">
+        <div className="group relative overflow-hidden rounded-xl border border-border bg-surface p-4 transition-all hover:shadow-md hover:border-white/20">
             {/* Burn Effect Overlay */}
             <BurnEffect isActive={showBurnEffect} onComplete={() => setShowBurnEffect(false)} />
             

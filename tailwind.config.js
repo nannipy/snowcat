@@ -4,17 +4,20 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: '#0a0a0a',
-        surface: '#121212',
-        primary: '#00E0FF', // Cyberpunk Cyan
-        secondary: '#FF003C', // Cyberpunk Red
-        accent: '#7000FF', // Cyberpunk Purple
-        text: '#E0E0E0',
-        muted: '#A0A0A0',
-        border: '#333333',
+        background: 'var(--color-background)',
+        surface: 'var(--color-surface)',
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+        accent: 'var(--color-accent)',
+        danger: 'var(--color-danger)',
+        success: 'var(--color-success)',
+        text: 'var(--color-text)',
+        muted: 'var(--color-muted)',
+        border: 'var(--color-border)',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

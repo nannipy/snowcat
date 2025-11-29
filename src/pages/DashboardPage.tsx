@@ -87,7 +87,7 @@ export function DashboardPage() {
 
             {/* All Assets (Whales) */}
             <section>
-                <h2 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-primary mb-4 flex items-center gap-2 justify-center">
                     <span>💎</span> Your Assets
                 </h2>
                 
