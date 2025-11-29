@@ -4,6 +4,8 @@ import { RotateCcw, Sun, Moon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 
+import { Link } from 'react-router-dom';
+
 export function Header() {
     const { isConnected, address, connect, disconnect } = useMockWallet();
     const [isDark, setIsDark] = useState(false);
@@ -42,12 +44,13 @@ export function Header() {
     return (
         <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-4xl rounded-full border border-white/20 bg-surface/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10 text-text transition-colors duration-300">
             <div className="flex h-16 items-center justify-between px-6">
-                <div className="flex items-center gap-3">
-                    <img src="/snowcat.png" alt="Snowcat" className="h-10 w-auto drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]"/>
-                    <span className="hidden sm:block font-bold text-xl tracking-tight text-text">Snowcat</span>
-                </div>
+                <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                    <img src="/snowcat.png" alt="Snowcat" className="h-14 w-auto drop-shadow-[0_0_10px_rgba(255,255,255,0.3)] mt-2"/>
+                    <span className="hidden sm:block font-bold text-xl tracking-tight text-transparent bg-gradient-to-l from-primary to-accent bg-clip-text">Snowcat</span>
+                </Link>
                 
                 <div className="flex items-center gap-4">
+                    <Link to="/about" className="text-sm font-medium text-muted hover:text-primary transition-colors">About</Link>
                     <button
                         onClick={toggleTheme}
                         className="p-2 text-muted hover:text-primary transition-colors hover:bg-secondary rounded-full"

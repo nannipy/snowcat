@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { DustScanner } from '../components/features/DustScanner';
 import { useGlacierBalances } from '../hooks/useGlacierBalances';
 import { useMockWallet } from '../hooks/useMockWallet';

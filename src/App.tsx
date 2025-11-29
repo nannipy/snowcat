@@ -6,6 +6,7 @@ import { config } from './wagmi';
 import { Layout } from './components/layout/Layout';
 import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { AboutPage } from './pages/AboutPage';
 import { useMockWallet } from './hooks/useMockWallet';
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -33,6 +34,14 @@ function App() {
                                             <DashboardPage />
                                         </Layout>
                                     </ProtectedRoute>
+                                } 
+                            />
+                            <Route 
+                                path="/about" 
+                                element={
+                                    <Layout>
+                                        <AboutPage />
+                                    </Layout>
                                 } 
                             />
                             <Route path="*" element={<Navigate to="/" replace />} />

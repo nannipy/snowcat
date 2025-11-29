@@ -5,10 +5,9 @@ import { useBurnToken } from '../../hooks/useBurnToken';
 import { use1inchSwap } from '../../hooks/use1inchSwap';
 import { DustCard } from './DustCard';
 import { GroomModal } from './GroomModal';
-import { TokenChart } from './TokenChart';
-import { Loader2, X } from 'lucide-react';
+import { Search, Loader2, X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface DustScannerProps {
     onAvalanche?: () => void;
@@ -20,8 +19,15 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
     const { burnToken, isBurnPending, isBurnConfirming } = useBurnToken();
     const { swapToken, isLoading: isSwapLoading } = use1inchSwap();
 
+    const [searchQuery, setSearchQuery] = useState('');
+
     // Filter for dust: value < $1 and > 0
-    const dustTokens = tokens?.filter(t => (t.value || 0) <= 1 && (t.value || 0) > 0) || [];
+    const dustTokens = tokens?.filter(t => {
+        const isDust = (t.value || 0) <= 1 && (t.value || 0) > 0;
+        const matchesSearch = t.symbol.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              t.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return isDust && matchesSearch;
+    }) || [];
 
     const [selectedToken, setSelectedToken] = useState<any | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -146,10 +152,26 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
     return (
         <div className="space-y-6 relative">
             <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-primary">Dust Found ({dustTokens.length})</h2>
-                <button onClick={() => refetch()} className="text-sm text-accent hover:underline">
-                    Rescan
-                </button>
+                <h2 className="text-lg font-bold text-primary">Dust Found</h2>
+                
+                {/* Expanding Search Bar */}
+                <div className="relative group">
+                    <div className={`flex items-center bg-surface border border-border rounded-full transition-all duration-300 ease-in-out ${searchQuery ? 'w-64 px-4' : 'w-10 h-10 justify-center group-hover:w-64 group-hover:px-4'}`}>
+                        <Search className={`w-4 h-4 text-muted transition-colors flex-shrink-0 ${searchQuery || 'group-hover:text-primary'}`} />
+                        <input 
+                            type="text"
+                            placeholder="Search dust..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className={`bg-transparent border-none outline-none text-sm ml-2 w-full text-text placeholder:text-muted/50 ${searchQuery ? 'block' : 'hidden group-hover:block'}`}
+                        />
+                        {searchQuery && (
+                            <button onClick={() => setSearchQuery('')} className="ml-2 text-muted hover:text-text flex-shrink-0">
+                                <X className="w-3 h-3" />
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {dustTokens.length === 0 ? (
@@ -158,8 +180,7 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
                 </div>
             ) : (
                 <motion.div 
-                    layout
-                    className="grid gap-4 sm:grid-cols-2 auto-rows-min grid-flow-dense"
+                    className="grid gap-4 sm:grid-cols-3 auto-rows-min grid-flow-dense"
                 >
                     {dustTokens.map((token) => {
                         const isExpanded = selectedId === token.address;

@@ -45,7 +45,7 @@ export function LoginPage() {
                     onClick={connect}
                     className="group relative overflow-hidden rounded-full bg-primary px-8 py-4 text-lg font-bold text-background transition-all hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)]"
                 >
-                    <span className="relative z-10">Enter the Den</span>
+                    <span className="relative z-10">Enter Snowcat</span>
                     <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
                 </motion.button>
             </motion.div>

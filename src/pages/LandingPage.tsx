@@ -81,8 +81,98 @@ export function LandingPage() {
                     transition={{ delay: 0.6, duration: 0.8 }}
                     className="flex justify-center pt-8"
                 >
-                    <div className="scale-125">
-                        <ConnectButton label="Connect Wallet" />
+                    <div className="scale-125 ">
+                        <ConnectButton.Custom>
+                            {({
+                                account,
+                                chain,
+                                openAccountModal,
+                                openChainModal,
+                                openConnectModal,
+                                authenticationStatus,
+                                mounted,
+                            }) => {
+                                const ready = mounted && authenticationStatus !== 'loading';
+                                const connected =
+                                    ready &&
+                                    account &&
+                                    chain &&
+                                    (!authenticationStatus ||
+                                        authenticationStatus === 'authenticated');
+
+                                return (
+                                    <div
+                                        {...(!ready && {
+                                            'aria-hidden': true,
+                                            'style': {
+                                                opacity: 0,
+                                                pointerEvents: 'none',
+                                                userSelect: 'none',
+                                            },
+                                        })}
+                                    >
+                                        {(() => {
+                                            if (!connected) {
+                                                return (
+                                                    <button 
+                                                        onClick={openConnectModal} 
+                                                        type="button" 
+                                                        className="bg-primary text-background px-8 py-3 rounded-full font-bold hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
+                                                    >
+                                                        Connect Wallet
+                                                    </button>
+                                                );
+                                            }
+
+                                            if (chain.unsupported) {
+                                                return (
+                                                    <button onClick={openChainModal} type="button" className="bg-red-500 text-white px-6 py-3 rounded-full font-bold hover:bg-red-600 transition-colors shadow-lg">
+                                                        Wrong network
+                                                    </button>
+                                                );
+                                            }
+
+                                            return (
+                                                <div style={{ display: 'flex', gap: 12 }}>
+                                                    <button
+                                                        onClick={openChainModal}
+                                                        style={{ display: 'flex', alignItems: 'center' }}
+                                                        type="button"
+                                                        className="bg-surface text-primary border-2 border-border px-4 py-2 rounded-full font-bold hover:bg-secondary transition-colors"
+                                                    >
+                                                        {chain.hasIcon && (
+                                                            <div
+                                                                style={{
+                                                                    background: chain.iconBackground,
+                                                                    width: 12,
+                                                                    height: 12,
+                                                                    borderRadius: 999,
+                                                                    overflow: 'hidden',
+                                                                    marginRight: 4,
+                                                                }}
+                                                            >
+                                                                {chain.iconUrl && (
+                                                                    <img
+                                                                        alt={chain.name ?? 'Chain icon'}
+                                                                        src={chain.iconUrl}
+                                                                        style={{ width: 12, height: 12 }}
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        {chain.name}
+                                                    </button>
+
+                                                    <button onClick={openAccountModal} type="button" className="bg-primary text-background px-4 py-2 rounded-full font-bold hover:opacity-90 transition-colors">
+                                                        {account.displayName}
+                                                    </button>
+                                                </div>
+                                            );
+                                        })()}
+                                    </div>
+                                );
+                            }}
+                        </ConnectButton.Custom>
                     </div>
                 </motion.div>
             </div>
