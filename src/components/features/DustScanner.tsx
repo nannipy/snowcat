@@ -18,11 +18,12 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
     const { burnToken, isBurnPending, isBurnConfirming } = useBurnToken();
     const { swapToken, isLoading: isSwapLoading } = use1inchSwap();
 
-    // Filter for dust: value < $1000 (increased for testing) and > 0
-    const dustTokens = tokens?.filter(t => (t.value || 0) < 1000 && (t.value || 0) > 0) || [];
+    // Filter for dust: value < $1 and > 0
+    const dustTokens = tokens?.filter(t => (t.value || 0) <= 1 && (t.value || 0) > 0) || [];
 
     const [selectedToken, setSelectedToken] = useState<any | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [groomedTokenId, setGroomedTokenId] = useState<string | null>(null);
 
     const handleGroomClick = (token: any) => {
         setSelectedToken(token);
@@ -34,7 +35,11 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
         try {
             const txHash = await swapToken(token.address, token.balance, token.decimals);
             
-            if (onAvalanche) onAvalanche(); // Trigger Avalanche Effect
+            // Close modal immediately
+            setIsModalOpen(false);
+
+            // Trigger Card Animation
+            setGroomedTokenId(token.address);
             
             toast.success(() => (
                 <div className="flex flex-col gap-1">
@@ -53,12 +58,17 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
             ));
             
             if (window.navigator.vibrate) window.navigator.vibrate(200);
-            refetch(); // Refresh list
-            refetchBalance(); // Refresh AVAX balance
-            setIsModalOpen(false);
+            
+            // Note: We do NOT refetch here. We wait for the animation to complete.
         } catch (err) {
             toast.error('Failed to groom');
         }
+    };
+
+    const handleGroomAnimationComplete = () => {
+        setGroomedTokenId(null);
+        refetch(); // Refresh list (removes the card)
+        refetchBalance(); // Refresh AVAX balance
     };
 
     const handleBury = async (token: any) => {
@@ -67,7 +77,7 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
         try {
             const txHash = await burnToken(token.address, BigInt(token.balance));
             
-            if (onAvalanche) onAvalanche(); // Trigger Avalanche Effect
+            if (onAvalanche) onAvalanche(); // Keep global effect for Bury if desired, or remove
             
             toast.success(() => (
                 <div className="flex flex-col gap-1">
@@ -143,6 +153,8 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
                             onBury={handleBury}
                             isGrooming={isSwapLoading && selectedToken?.address === token.address}
                             isBurying={(isBurnPending || isBurnConfirming) && selectedToken?.address === token.address}
+                            isGroomed={groomedTokenId === token.address}
+                            onGroomComplete={handleGroomAnimationComplete}
                         />
                     ))}
                 </div>

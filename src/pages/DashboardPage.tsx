@@ -2,65 +2,76 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { DustScanner } from '../components/features/DustScanner';
 import { useGlacierBalances } from '../hooks/useGlacierBalances';
-import { AvalancheConfetti } from '../components/effects/AvalancheConfetti';
-import { Loader2, TrendingUp, Wallet } from 'lucide-react';
+import { useMockWallet } from '../hooks/useMockWallet';
+import { Loader2, Wallet } from 'lucide-react';
 
 export function DashboardPage() {
     const { data: tokens, isLoading } = useGlacierBalances();
-    const [isConfettiActive, setIsConfettiActive] = useState(false);
+    const { address } = useMockWallet();
 
     // Separate Dust (< $5) from Whales (>= $5)
-    const dustTokens = tokens?.filter(t => (t.value || 0) < 5 && (t.value || 0) > 0) || [];
-    const whaleTokens = tokens?.filter(t => (t.value || 0) >= 5) || [];
+    const dustTokens = tokens?.filter(t => (t.value || 0) < 1 && (t.value || 0) > 0) || [];
+    const whaleTokens = tokens?.filter(t => (t.value || 0) >= 1) || [];
 
     // Calculate Net Worth
     const netWorth = tokens?.reduce((acc, t) => acc + (t.value || 0), 0) || 0;
 
     return (
         <>
-            <AvalancheConfetti isActive={isConfettiActive} onComplete={() => setIsConfettiActive(false)} />
             
             <div className="container mx-auto max-w-5xl p-4 pb-20 space-y-8">
-            {/* Hero Stats */}
-            {/* Hero Stats */}
+            {/* Hero Stats - Compact */}
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-3xl bg-surface p-8 border border-border shadow-sm relative overflow-hidden"
+                className="rounded-2xl bg-surface p-6 border border-border shadow-sm"
             >
-                
-                <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2 text-muted">
-                            <Wallet className="h-5 w-5" />
-                            <span className="text-sm font-medium">Net Worth</span>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    {/* Net Worth */}
+                    <div>
+                        <div className="flex items-center gap-2 text-muted mb-1">
+                            <Wallet className="h-4 w-4" />
+                            <span className="text-xs font-bold uppercase tracking-wider">Net Worth</span>
                         </div>
-                        <button 
-                            onClick={() => window.location.reload()} 
-                            className="p-2 hover:bg-secondary rounded-full transition-colors text-muted hover:text-primary"
-                            title="Refresh Balances"
-                        >
-                        </button>
+                        <div className="text-3xl font-bold text-primary tracking-tight">
+                            ${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
                     </div>
-                    
-                    <div className="text-5xl font-bold text-primary tracking-tight">
-                        ${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+
+                    {/* Wallet Info */}
+                    <div className="flex items-center gap-3 bg-secondary/50 px-4 py-2 rounded-xl border border-border/50">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-sm">👤</span>
+                        </div>
+                        <div>
+                            <div className="text-[10px] text-muted uppercase font-bold">Wallet</div>
+                            <div className="text-sm font-mono font-medium text-primary">
+                                {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Not Connected'}
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div className="flex items-center gap-2 mt-4 text-success text-sm font-medium bg-success/10 w-fit px-3 py-1 rounded-full">
-                        <TrendingUp className="h-4 w-4" />
-                        <span>+2.4% (24h)</span>
+
+                    {/* Quick Stats */}
+                    <div className="flex gap-8 md:border-l md:border-border md:pl-8">
+                        <div>
+                            <div className="text-[10px] text-muted uppercase font-bold">Assets</div>
+                            <div className="text-xl font-bold text-primary">{tokens?.length || 0}</div>
+                        </div>
+                        <div>
+                            <div className="text-[10px] text-muted uppercase font-bold">Dust</div>
+                            <div className="text-xl font-bold text-primary">{dustTokens.length}</div>
+                        </div>
                     </div>
                 </div>
             </motion.div>
 
             {/* Suggested Cleanup (Dust) */}
             <section>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-center mb-4">
                     <h2 className="text-xl font-bold text-primary flex items-center gap-2">
                         <span>🧹</span> Suggested Cleanup
                     </h2>
-                    <span className="text-sm text-muted bg-secondary px-2 py-1 rounded-md">
+                    <span className="ml-4 text-sm text-muted bg-secondary px-2 py-1 rounded-md">
                         {dustTokens.length} items
                     </span>
                 </div>
@@ -70,7 +81,7 @@ export function DashboardPage() {
                     but for now it works as a self-contained feature. 
                 */}
                 <div className="rounded-3xl bg-surface/50 border border-border/50 p-6 backdrop-blur-sm">
-                    <DustScanner onAvalanche={() => setIsConfettiActive(true)} />
+                    <DustScanner />
                 </div>
             </section>
 

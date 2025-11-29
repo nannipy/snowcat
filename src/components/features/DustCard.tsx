@@ -1,7 +1,8 @@
 import { formatUnits } from 'viem';
 import { Trash2, Recycle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BurnEffect } from '../effects/BurnEffect';
+import { AvalancheConfetti } from '../effects/AvalancheConfetti';
 
 interface Token {
     address: string;
@@ -19,27 +20,45 @@ interface DustCardProps {
     onBury: (token: Token) => void;
     isGrooming?: boolean;
     isBurying?: boolean;
+    isGroomed?: boolean;
+    onGroomComplete?: () => void;
 }
 
-export function DustCard({ token, onGroom, onBury, isGrooming, isBurying }: DustCardProps) {
+export function DustCard({ token, onGroom, onBury, isGrooming, isBurying, isGroomed, onGroomComplete }: DustCardProps) {
     const balanceFormatted = formatUnits(BigInt(token.balance), token.decimals);
     const displayBalance = parseFloat(balanceFormatted).toLocaleString(undefined, { maximumFractionDigits: 4 });
     const displayValue = token.value ? `$${token.value.toFixed(2)}` : '$0.00';
     
     const [showBurnEffect, setShowBurnEffect] = useState(false);
+    const [showGroomEffect, setShowGroomEffect] = useState(false);
     
+    useEffect(() => {
+        if (isGroomed) {
+            setShowGroomEffect(true);
+        }
+    }, [isGroomed]);
+
     const handleBury = () => {
         setShowBurnEffect(true);
         // Delay the actual bury call to show the animation first
         setTimeout(() => {
             onBury(token);
-        }, 1500);
+        }, 2000);
     };
 
     return (
         <div className="group relative overflow-hidden rounded-xl border border-border bg-surface p-4 transition-all hover:shadow-md hover:border-accent/50">
             {/* Burn Effect Overlay */}
             <BurnEffect isActive={showBurnEffect} onComplete={() => setShowBurnEffect(false)} />
+            
+            {/* Groom Effect Overlay (Avalanche) */}
+            <AvalancheConfetti 
+                isActive={showGroomEffect} 
+                onComplete={() => {
+                    setShowGroomEffect(false);
+                    if (onGroomComplete) onGroomComplete();
+                }} 
+            />
             
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">

@@ -8,11 +8,11 @@ interface BurnEffectProps {
 
 interface Flame {
     id: number;
-    x: number;
-    y: number;
+    left: number;
     delay: number;
     duration: number;
-    size: number;
+    scale: number;
+    maxHeight: number; // How high this flame goes (percentage)
 }
 
 export function BurnEffect({ isActive, onComplete }: BurnEffectProps) {
@@ -20,21 +20,22 @@ export function BurnEffect({ isActive, onComplete }: BurnEffectProps) {
 
     useEffect(() => {
         if (isActive) {
-            // Generate flames
-            const newFlames: Flame[] = Array.from({ length: 20 }, (_, i) => ({
+            // Generate many more flames for a dense effect
+            const flameCount = 60;
+            const newFlames: Flame[] = Array.from({ length: flameCount }, (_, i) => ({
                 id: i,
-                x: Math.random() * 100, // Percentage
-                y: 100 - Math.random() * 30, // Start from bottom
-                delay: Math.random() * 0.3,
-                duration: 0.8 + Math.random() * 0.4,
-                size: 20 + Math.random() * 20
+                left: Math.random() * 100, // Random horizontal position
+                delay: Math.random() * 0.5, // Stagger start times
+                duration: 0.8 + Math.random() * 0.8, // Varying speeds
+                scale: 0.8 + Math.random() * 1.5, // Varying sizes
+                maxHeight: -20 + Math.random() * 60 // Some go to top (-20%), some stay lower
             }));
             setFlames(newFlames);
 
             // Complete after animation
             const timer = setTimeout(() => {
                 if (onComplete) onComplete();
-            }, 1500);
+            }, 2000); // Slightly longer to let fire burn
 
             return () => clearTimeout(timer);
         } else {
@@ -50,9 +51,9 @@ export function BurnEffect({ isActive, onComplete }: BurnEffectProps) {
             <motion.div
                 className="absolute inset-0 bg-black"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.7 }}
+                animate={{ opacity: 0.8 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.5 }}
             />
 
             {/* Flames */}
@@ -60,26 +61,25 @@ export function BurnEffect({ isActive, onComplete }: BurnEffectProps) {
                 {flames.map((flame) => (
                     <motion.div
                         key={flame.id}
-                        className="absolute text-2xl"
+                        className="absolute text-4xl origin-bottom"
                         style={{
-                            left: `${flame.x}%`,
-                            fontSize: flame.size,
+                            left: `${flame.left}%`,
                         }}
                         initial={{ 
-                            y: `${flame.y}%`,
+                            bottom: '-20%',
                             opacity: 0,
-                            scale: 0.5
+                            scale: 0
                         }}
                         animate={{ 
-                            y: '-20%',
+                            bottom: `${100 - flame.maxHeight}%`, // Move up
                             opacity: [0, 1, 1, 0],
-                            scale: [0.5, 1.2, 1, 0.8],
-                            rotate: [0, -10, 10, 0]
+                            scale: [0, flame.scale, flame.scale * 0.8, 0],
                         }}
                         transition={{
                             duration: flame.duration,
                             delay: flame.delay,
-                            ease: 'easeOut'
+                            ease: 'easeOut',
+                            times: [0, 0.2, 0.8, 1]
                         }}
                     >
                         🔥
@@ -87,50 +87,14 @@ export function BurnEffect({ isActive, onComplete }: BurnEffectProps) {
                 ))}
             </AnimatePresence>
 
-            {/* Smoke effect */}
+            {/* Intense Smoke effect */}
             <motion.div
-                className="absolute inset-0 bg-gradient-to-t from-gray-600/30 via-gray-400/20 to-transparent"
+                className="absolute inset-0 bg-gradient-to-t from-orange-900/40 via-gray-900/40 to-black/60"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
+                transition={{ duration: 1, delay: 0.2 }}
             />
-
-            {/* Ash particles */}
-            {Array.from({ length: 10 }).map((_, i) => (
-                <motion.div
-                    key={`ash-${i}`}
-                    className="absolute w-1 h-1 bg-gray-400 rounded-full"
-                    style={{
-                        left: `${Math.random() * 100}%`,
-                        top: `${50 + Math.random() * 50}%`,
-                    }}
-                    initial={{ opacity: 0, y: 0 }}
-                    animate={{ 
-                        opacity: [0, 0.6, 0],
-                        y: -50 - Math.random() * 50,
-                        x: (Math.random() - 0.5) * 30
-                    }}
-                    transition={{
-                        duration: 1 + Math.random() * 0.5,
-                        delay: 0.5 + Math.random() * 0.3,
-                        ease: 'easeOut'
-                    }}
-                />
-            ))}
-
-            {/* Burn text */}
-            <motion.div
-                className="absolute inset-0 flex items-center justify-center"
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-            >
-                <div className="text-4xl font-bold text-orange-500 drop-shadow-lg">
-                    ⚰️
-                </div>
-            </motion.div>
         </div>
     );
 }
