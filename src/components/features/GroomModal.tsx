@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Loader2, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { mockBackend, type MockToken } from '../../lib/mockBackend';
 
@@ -8,9 +9,10 @@ interface GroomModalProps {
     onClose: () => void;
     onConfirm: (token: MockToken) => void;
     isLoading: boolean;
+    position?: { top: number; left: number } | null;
 }
 
-export function GroomModal({ token, isOpen, onClose, onConfirm, isLoading }: GroomModalProps) {
+export function GroomModal({ token, isOpen, onClose, onConfirm, isLoading, position }: GroomModalProps) {
     const [quote, setQuote] = useState<{ avaxAmount: number; gasFee: number; rate: number } | null>(null);
     const [isQuoteLoading, setIsQuoteLoading] = useState(false);
 
@@ -30,9 +32,27 @@ export function GroomModal({ token, isOpen, onClose, onConfirm, isLoading }: Gro
     const isConvenient = quote ? quote.avaxAmount > quote.gasFee : false;
     const netAmount = quote ? quote.avaxAmount - quote.gasFee : 0;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-xl animate-in fade-in zoom-in duration-200">
+    return createPortal(
+        <>
+            {/* Backdrop */}
+            <div 
+                className="fixed inset-0 z-[100] bg-black/20 backdrop-blur-[1px]" 
+                onClick={onClose}
+            />
+            
+            {/* Modal */}
+            <div 
+                className="fixed z-[101] w-full max-w-sm rounded-2xl border border-border bg-surface p-6 shadow-2xl animate-in fade-in zoom-in duration-200"
+                style={position ? { 
+                    top: position.top, 
+                    left: '50%', // Always center horizontally
+                    transform: 'translate(-50%, -100%) translateY(-10px)' // Position above button
+                } : {
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                }}
+            >
                 <h2 className="text-xl font-bold text-primary mb-4">Groom {token.symbol}</h2>
                 
                 {isQuoteLoading ? (
@@ -101,6 +121,7 @@ export function GroomModal({ token, isOpen, onClose, onConfirm, isLoading }: Gro
                     </div>
                 )}
             </div>
-        </div>
+        </>,
+        document.body
     );
 }

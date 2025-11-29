@@ -5,8 +5,10 @@ import { useBurnToken } from '../../hooks/useBurnToken';
 import { use1inchSwap } from '../../hooks/use1inchSwap';
 import { DustCard } from './DustCard';
 import { GroomModal } from './GroomModal';
-import { Loader2 } from 'lucide-react';
+import { TokenChart } from './TokenChart';
+import { Loader2, X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface DustScannerProps {
     onAvalanche?: () => void;
@@ -23,9 +25,20 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
 
     const [selectedToken, setSelectedToken] = useState<any | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
     const [groomedTokenId, setGroomedTokenId] = useState<string | null>(null);
+    const [selectedId, setSelectedId] = useState<string | null>(null);
 
-    const handleGroomClick = (token: any) => {
+    const handleGroomClick = (token: any, e?: React.MouseEvent) => {
+        if (e) {
+            const rect = (e.target as HTMLElement).getBoundingClientRect();
+            setModalPosition({
+                top: rect.top,
+                left: rect.left + rect.width / 2
+            });
+        } else {
+            setModalPosition(null);
+        }
         setSelectedToken(token);
         setIsModalOpen(true);
     };
@@ -131,7 +144,7 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 relative">
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-primary">Dust Found ({dustTokens.length})</h2>
                 <button onClick={() => refetch()} className="text-sm text-accent hover:underline">
@@ -144,20 +157,30 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
                     <p className="text-muted">No dust found! Your wallet is clean. ✨</p>
                 </div>
             ) : (
-                <div className="grid gap-4 sm:grid-cols-2">
-                    {dustTokens.map((token) => (
-                        <DustCard 
-                            key={token.address} 
-                            token={token} 
-                            onGroom={handleGroomClick} 
-                            onBury={handleBury}
-                            isGrooming={isSwapLoading && selectedToken?.address === token.address}
-                            isBurying={(isBurnPending || isBurnConfirming) && selectedToken?.address === token.address}
-                            isGroomed={groomedTokenId === token.address}
-                            onGroomComplete={handleGroomAnimationComplete}
-                        />
-                    ))}
-                </div>
+                <motion.div 
+                    layout
+                    className="grid gap-4 sm:grid-cols-2 auto-rows-min grid-flow-dense"
+                >
+                    {dustTokens.map((token) => {
+                        const isExpanded = selectedId === token.address;
+                        return (
+                            <DustCard 
+                                key={token.address} 
+                                token={token} 
+                                onGroom={(token, e) => handleGroomClick(token, e)} 
+                                onBury={handleBury}
+                                isGrooming={isSwapLoading && selectedToken?.address === token.address}
+                                isBurying={(isBurnPending || isBurnConfirming) && selectedToken?.address === token.address}
+                                isGroomed={groomedTokenId === token.address}
+                                onGroomComplete={handleGroomAnimationComplete}
+                                layoutId={token.address}
+                                onClick={() => setSelectedId(isExpanded ? null : token.address)}
+                                isExpanded={isExpanded}
+                                className={isExpanded ? "sm:col-span-2 sm:row-span-2 z-10" : ""}
+                            />
+                        );
+                    })}
+                </motion.div>
             )}
             
             {selectedToken && (
@@ -167,6 +190,7 @@ export function DustScanner({ onAvalanche }: DustScannerProps) {
                     onClose={() => setIsModalOpen(false)}
                     onConfirm={handleConfirmGroom}
                     isLoading={isSwapLoading}
+                    position={modalPosition}
                 />
             )}
             <Toaster position="bottom-center" />
