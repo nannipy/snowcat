@@ -5,20 +5,7 @@ import { useMockWallet } from './useMockWallet';
 import { mockBackend, type MockToken } from '../lib/mockBackend';
 import { FUJI_TOKENS } from '../constants/tokens';
 
-// Map symbols to CoinGecko IDs
-/*
-const COINGECKO_IDS: Record<string, string> = {
-    'AVAX': 'avalanche-2',
-    'USDC': 'usd-coin',
-    'USDC.e': 'usd-coin',
-    'WETH': 'ethereum',
-    'LINK': 'chainlink'
-};
-*/
 
-// Chainlink AVAX/USD Price Feed
-// C-Chain (Mainnet): 0x0A77230d17318075983913bC2145DB16C7366156
-// Fuji (Testnet): 0x5498BB86BC934c8D34FDA08E81D444153d0D06aD
 const AVAX_USD_FEED = '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD'; // Fuji Testnet
 const CHAINLINK_ABI = [{
     inputs: [],
@@ -185,8 +172,6 @@ export function useGlacierBalances() {
                         }
                     });
                 }
-
-                // Add Mock Dust (Smoke & Mirrors)
                 // We fetch from mockBackend so that if we "swap" them, they disappear.
                 const mockTokens = await mockBackend.getBalances();
                 console.log('Mock dust tokens:', mockTokens.length);

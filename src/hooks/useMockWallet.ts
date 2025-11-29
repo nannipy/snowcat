@@ -49,10 +49,6 @@ export function useMockWallet() {
         queryFn: async () => {
             if (!isConnected) return 0;
             if (isWagmiConnected) {
-                // TODO: Fetch real balance using wagmi/viem if needed, 
-                // but for now we can rely on useGlacierBalances or similar.
-                // Or we can fetch it here if we want to show it in the header.
-                // For now, return mock balance to avoid breaking UI if it expects a number.
                 return 0;
             }
             return await mockBackend.getAvaxBalance();
