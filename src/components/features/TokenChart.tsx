@@ -16,7 +16,6 @@ export function TokenChart({ color = '#22c55e', trend = 'up' }: TokenChartProps)
         const points = [];
         const count = 40;
         let value = 50;
-        const seed = TIME_RANGES.indexOf(activeRange) * 1000;
 
         for (let i = 0; i < count; i++) {
             const bias = trend === 'up' ? 0.5 : -0.5;
@@ -42,7 +41,7 @@ export function TokenChart({ color = '#22c55e', trend = 'up' }: TokenChartProps)
         return points;
     }, [activeRange, trend]);
 
-    const CustomTooltip = ({ active, payload, label }: any) => {
+    const CustomTooltip = ({ active, payload }: any) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-surface/90 backdrop-blur border border-white/10 px-3 py-2 rounded-lg shadow-lg">
